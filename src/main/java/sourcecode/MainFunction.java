@@ -131,6 +131,7 @@ public class MainFunction implements CoolQHttpApp {
         System.out.println("管理员: "+ tool.hyy);
         System.out.println("执行环境: "+ (tool.windowsOS ? "开发" : "使用"));
 
+
         /*启动成功时用以提示 发送一条信息*/
         String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
         sender.SENDER.sendPrivateMsg(String.valueOf(tool.hyy),new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));

@@ -22,9 +22,7 @@ public class Tlc {
     private final String windowsJsonDataPath = "C:/Users/Yiluo/Desktop/jsondata/data.json";
     private final String linuxJsonDataPath = "/root/jsondata/data.json";
 
-    /*系统识别懒得加..对！都到这种地步了*/
-    //public static final String voicePath = "C:/Users/Yiluo/Desktop/outdate/";
-    public static final String voicePath = "C:/Users/Yiluo/Desktop/cqp/酷Q Pro/data/record/";
+    public static String voicePath = null;
 
     public static boolean windowsOS = false;
 
@@ -50,7 +48,7 @@ public class Tlc {
     public  static final HashMap options = new HashMap(){{
         put("spd", "5");
         put("pit", "4");
-        put("per", "3"); // 情感逍遥
+        put("per", "111"); // 3 情感逍遥 // 111 较为好听的女声
     }};
 
     public Tlc(){ /*构造*/
@@ -77,11 +75,19 @@ public class Tlc {
                 messageImageSavePath = jobj.getString("windowsMessageImagesPath");
                 hyy = testQQ;
                 hyyGroup = testGroup;
+                voicePath = jobj.getString("windowsVoicePath");
+
+                if(false){
+                    hyy = jobj.getString("hyy");
+                    hyyGroup = jobj.getString("hyyGroup");
+                }
             }
             else{
                 messageImageSavePath = jobj.getString("linuxMessageImagesPath");
                 hyy = jobj.getString("hyy");
                 hyyGroup = jobj.getString("hyyGroup");
+                voicePath = jobj.getString("linuxVoicePath");
+
             }
         }
         else {

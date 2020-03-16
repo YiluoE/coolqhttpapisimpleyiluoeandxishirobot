@@ -70,8 +70,7 @@ public class GroupMsgListenner {
                     String voiceFileName = String.valueOf(new Random().nextLong())+".mp3";
                     BdAipSpeech.getFile(data,  voiceFileName);
                     msgSender.SENDER.sendGroupMsg(groupMsg.getGroup(),
-                            "[CQ:record,"+"file="+voiceFileName+"]"
-                    );
+                            "[CQ:record,"+"file="+voiceFileName+"]");
                 }
 
             }
@@ -103,7 +102,17 @@ public class GroupMsgListenner {
                             }
                             return;
                         }
-                        msgSender.SENDER.sendGroupMsg(groupMsg.getGroup(), tulingMsg);
+                        /*正常*/
+                        else{
+                            TtsResponse ttsResponse = Tlc.baiduAipSpeech.synthesis(tulingMsg, "zh", 1, Tlc.options);
+                            byte[] data = ttsResponse.getData();
+                            String voiceFileName = String.valueOf(new Random().nextLong())+".mp3";
+                            BdAipSpeech.getFile(data,  voiceFileName);
+                            msgSender.SENDER.sendGroupMsg(groupMsg.getGroup(),
+                                    "[CQ:record,"+"file="+voiceFileName+"]"
+                            );
+
+                        }
                     }
                     return;
                 }

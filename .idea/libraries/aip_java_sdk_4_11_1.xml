@@ -1,7 +1,8 @@
 <component name="libraryTable">
   <library name="aip-java-sdk-4.11.1">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/../aip-java-sdk-4.11.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/aip-java-sdk-4.11.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/json-20160810.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
