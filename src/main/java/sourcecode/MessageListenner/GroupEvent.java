@@ -5,7 +5,7 @@ import com.forte.qqrobot.beans.messages.msgget.GroupAddRequest;
 import com.forte.qqrobot.beans.messages.msgget.GroupMemberReduce;
 import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
 import com.forte.qqrobot.sender.MsgSender;
-import sourcecode.Tools.ToolClass;
+import sourcecode.Util.Tlc;
 
 public class GroupEvent {
 
@@ -13,7 +13,7 @@ public class GroupEvent {
     @Listen(MsgGetTypes.groupAddRequest)
     public void GroupAdd(GroupAddRequest groupAddRequest, MsgSender sender) {
 
-        if (groupAddRequest.getGroup().equals(ToolClass.hyyGroup)) {
+        if (groupAddRequest.getGroup().equals(Tlc.hyyGroup)) {
 
             sender.SENDER.sendGroupMsg(
                     groupAddRequest.getGroup(),
@@ -31,13 +31,13 @@ public class GroupEvent {
 
             String msg = groupAddRequest.getMsg().indexOf("邀请人")==-1?"G D X 有人通过搜索添加 进入你的群~":"通过群成员邀请进的群呢~";
             String groupAddRequestMsg = groupAddRequest.getMsg();
-            if(!ToolClass.windowsOS){
-                sender.SENDER.sendPrivateMsg(ToolClass.hyy,msg);
-                sender.SENDER.sendPrivateMsg(ToolClass.hyy,groupAddRequestMsg);
+            if(!Tlc.windowsOS){
+                sender.SENDER.sendPrivateMsg(Tlc.hyy,msg);
+                sender.SENDER.sendPrivateMsg(Tlc.hyy,groupAddRequestMsg);
             }
 
-            sender.SENDER.sendPrivateMsg(String.valueOf(ToolClass.testQQ),msg);
-            sender.SENDER.sendPrivateMsg(String.valueOf(ToolClass.testQQ),groupAddRequestMsg);
+            sender.SENDER.sendPrivateMsg(String.valueOf(Tlc.testQQ),msg);
+            sender.SENDER.sendPrivateMsg(String.valueOf(Tlc.testQQ),groupAddRequestMsg);
 
         }
 
@@ -47,7 +47,7 @@ public class GroupEvent {
     @Listen(MsgGetTypes.groupMemberReduce)
     public void GroupReduce(GroupMemberReduce groupMemberReduce, MsgSender sender) {
 
-        if (groupMemberReduce.getGroup().equals(ToolClass.hyyGroup)) {
+        if (groupMemberReduce.getGroup().equals(Tlc.hyyGroup)) {
             sender.SENDER.sendGroupMsg(
                     groupMemberReduce.getGroup(),
                     "最终: " + "\"" + sender.getPersonInfoByCode(groupMemberReduce.getBeOperatedQQ()).getName() + "\"" + " 还是选择了离开..."
