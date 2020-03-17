@@ -1,6 +1,5 @@
 package sourcecode.MessageListenner;
 
-import com.baidu.aip.speech.AipSpeech;
 import com.baidu.aip.speech.TtsResponse;
 import com.forte.qqrobot.anno.Listen;
 import com.forte.qqrobot.beans.messages.msgget.GroupMsg;
@@ -40,7 +39,7 @@ public class GroupMsgListenner {
         }
 
         /*管理群*/
-        if(groupMsg.getGroup().equals(Tlc.hyyGroup)){
+        if(Tlc.managementGroupAry.contains(groupMsg.getGroup())){
 
             /*命令消息*/
             char[] commendMsg = groupMsg.getMsg().toCharArray();
@@ -75,12 +74,15 @@ public class GroupMsgListenner {
 
             }
 
-            /*复读机*/
-            Tlc.cache(groupMsg, msgSender);
+            /*复读机*/ /*多群*/
+            if(Tlc.managementGroupAry.contains(groupMsg.getGroup()))
+                Tlc.cache(groupMsg, msgSender);
+            //多群重复... 冷却貌似会变哑巴
+            //windows不会变哑巴 儿linux会变成哑巴
 
             /*被at则被图灵回复*/
             if(Tlc.returnAt(util,groupMsg)){
-                if(groupMsg.getGroup().equals(Tlc.hyyGroup)) {
+                if(Tlc.managementGroupAry.contains(groupMsg.getGroup())) {
                     for (String tulingMsg : Tlc.tuling.getMessage(groupMsg.getMsg())) {
                         if (tulingMsg.equals("亲爱的，当天请求次数已用完。")) {
                             if (!Tlc.banQQlist.contains(groupMsg.getQQ())) {

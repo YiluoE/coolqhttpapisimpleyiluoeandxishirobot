@@ -11,6 +11,6 @@ public class MyCoolQHttpApplication extends CoolQHttpApplication {
 
     /* 用来去掉群主的彩色日志的因为它在Linux会乱码 */ /*不！我纠正一下在我的黑白控制台上乱码...*/
     @Override
-    protected void _hello$() { System.out.println("\n"); }
+    protected void _hello$() { System.out.println(""); }
 
 }

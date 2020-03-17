@@ -24,7 +24,7 @@ public class PrivateMsgListenner {
             System.out.println("昵称: "+ Tlc.friendMap.get(privateMsg.getQQ())+" 消息为: "+privateMsg.getMsg()+"\n");
 
 
-        if(privateMsg.getQQ().equals(Tlc.testQQ))
+        if(Tlc.administrators.contains(privateMsg.getQQ()))
             sender.SENDER.sendPrivateMsg(privateMsg.getQQ(),"如你所愿莫得问题!！");
 
     }

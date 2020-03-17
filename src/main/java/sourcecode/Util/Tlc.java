@@ -6,6 +6,8 @@ import com.forte.qqrobot.beans.cqcode.CQCode;
 import com.forte.qqrobot.beans.messages.msgget.GroupMsg;
 import com.forte.qqrobot.sender.MsgSender;
 import com.forte.qqrobot.utils.CQCodeUtil;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.json.JSONArray;
 
 import javax.swing.*;
 import java.io.*;
@@ -16,7 +18,6 @@ import java.util.HashMap;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 public class Tlc {
 
     private final String windowsJsonDataPath = "C:/Users/Yiluo/Desktop/jsondata/data.json";
@@ -25,12 +26,6 @@ public class Tlc {
     public static String voicePath = null;
 
     public static boolean windowsOS = false;
-
-    public static String
-            testQQ = null,
-            testGroup = null,
-            hyy = null,
-            hyyGroup = null;
 
     public static String messageImageSavePath = null;
 
@@ -51,6 +46,16 @@ public class Tlc {
         put("per", "111"); // 3 情感逍遥 // 111 较为好听的女声
     }};
 
+    /*用以加载配置与数据*/
+    public static JSONObject jobj = null;
+
+    public static ArrayList<String > managementGroupAry = new ArrayList<>();
+    public static ArrayList<String> administrators = new ArrayList<>();
+
+    /*md5效验*/
+    public static ArrayList<String> md5s = new ArrayList<>();
+    public static JSONArray md5jsons = new JSONArray();
+
     public Tlc(){ /*构造*/
 
         boolean os = windowsOS = System.getProperty("os.name").toLowerCase().startsWith("windows");
@@ -62,38 +67,63 @@ public class Tlc {
         }catch (Exception e){}
 
         /*加载配置*/
-        JSONObject jobj = JSON.parseObject(new String(data));
+        jobj = JSON.parseObject(new String(data));
         if(jobj != null){
             tuling = new TuLing(jobj.getString("tuling_api_key"));
 
             baiduAipSpeech = new BdAipSpeech(jobj.getString("baidu_api_id"),jobj.getString("baidu_api_key"),jobj.getString("baidu_api_secertkey"));
 
 
-            testQQ = jobj.getString("testQQ");
-            testGroup = jobj.getString("testGroup");
             if(os){
                 messageImageSavePath = jobj.getString("windowsMessageImagesPath");
-                hyy = testQQ;
-                hyyGroup = testGroup;
                 voicePath = jobj.getString("windowsVoicePath");
 
-                if(false){
-                    hyy = jobj.getString("hyy");
-                    hyyGroup = jobj.getString("hyyGroup");
-                }
             }
             else{
                 messageImageSavePath = jobj.getString("linuxMessageImagesPath");
-                hyy = jobj.getString("hyy");
-                hyyGroup = jobj.getString("hyyGroup");
                 voicePath = jobj.getString("linuxVoicePath");
 
             }
         }
         else {
-            System.out.println("json error");
+            System.out.println("json option load error");
             /*兄弟出问题了在这里中断叭...不要再让java做无畏的挣扎了,毕竟ta还是个年轻的咖啡*/
         } /* 加载配置 End */
+
+
+        new Thread(()->{
+            try {
+                File md5sFile = new File(jobj.getString(os?"windowsMD5sPath":"linuxMD5sPath"));
+                /*如果没有md5序列则根据现有文件创建序列*/
+                if(!md5sFile.exists()){
+                    File[] files = new File(messageImageSavePath).listFiles();
+                    if(files != null){
+                        for(File file : files){
+                                byte[] md5bytes = new byte[(int)file.length()];
+                                new FileInputStream(file).read(md5bytes);
+                                md5jsons.put(DigestUtils.md5Hex(md5bytes));
+                        }
+                    }
+
+                    String md5str = md5jsons.toString(2);
+                    byte[] md5bytes = new byte[md5str.length()];
+                    md5bytes = md5str.getBytes("GBK");
+
+                    FileOutputStream filesos = new FileOutputStream(md5sFile);
+                    filesos.write(md5bytes,0,md5bytes.length);
+                    filesos.close();
+                }
+
+                /*如果有则读取*/
+                byte[] md5Data = new byte[(int)md5sFile.length()];
+
+                new FileInputStream(md5sFile).read(md5Data);
+
+                for(Object md5obj : new JSONArray(new String(md5Data)))
+                    md5s.add(md5obj.toString());
+
+            }catch (Exception e){}
+        }).start();
 
     } /*构造 End*/
 
@@ -115,7 +145,44 @@ public class Tlc {
     // 消息缓存用以复读= =
     public static boolean cooling = true;
     public static String msgCache = null;
-    public static void cache(GroupMsg groupMsg, MsgSender sender){
+
+    public static class MsgCache{
+        public boolean cooling = true;
+        public String msgCache = null;
+    }
+    public static HashMap<String,MsgCache> msgCacheMap = new HashMap<>();
+
+    public static void cache(GroupMsg groupMsg, MsgSender sender) {
+        if (msgCacheMap.get(groupMsg.getGroup()).cooling) {
+            if (msgCacheMap.get(groupMsg.getGroup()).msgCache == null) {
+                msgCacheMap.get(groupMsg.getGroup()).msgCache = groupMsg.getMsg();
+                return;
+            }
+
+            if (msgCacheMap.get(groupMsg.getGroup()).msgCache.equals(groupMsg.getMsg())) {
+                sender.SENDER.sendGroupMsg(groupMsg.getGroup(), groupMsg.getMsg());
+                msgCacheMap.get(groupMsg.getGroup()).msgCache = null;
+                msgCacheMap.get(groupMsg.getGroup()).cooling = false;
+                new Thread(() -> {
+                    try {
+                        //sender.SENDER.sendGroupMsg(groupMsg.getGroup(), "cooling~");
+                        Thread.sleep((1000 * 60) * 3/*最后*分钟*/);
+                        //msgCacheMap.get(groupMsg.getGroup()).cooling = true;
+                        msgCacheMap.get(groupMsg.getGroup()).msgCache = null;
+                        //sender.SENDER.sendGroupMsg(groupMsg.getGroup(), "cooling End~");
+                    } catch (Exception e) {
+                    }
+                }).run();
+                return;
+            } else
+                msgCacheMap.get(groupMsg.getGroup()).msgCache = groupMsg.getMsg();
+
+        } else {
+            return;
+        }
+    }
+
+  /*  public static void cache(GroupMsg groupMsg, MsgSender sender){
         if(cooling){
             if(msgCache == null){
                 msgCache = groupMsg.getMsg();
@@ -129,16 +196,19 @@ public class Tlc {
                 new Thread(() -> {
                     try {
                         //sender.SENDER.sendGroupMsg(groupMsg.getGroup(), "cooling~");
-                        Thread.sleep((1000 * 60) * 5/*最后*分钟*/);
+                        Thread.sleep((1000 * 60) * 3*//*最后*分钟*//*);
                         cooling = true;
+                        msgCache = null;
                         //sender.SENDER.sendGroupMsg(groupMsg.getGroup(), "cooling End~");
                     } catch (Exception e) {}
                 }).run();
                 return;
             }else
                 msgCache = groupMsg.getMsg();
+        }else{
+            return;
         }
-    }
+    }*/
 
     public static void getMessageInImage(String msgString){
 
@@ -181,8 +251,14 @@ public class Tlc {
                 inStream.close();
                 byte[] data = outStream.toByteArray();
 
+                String md5 = DigestUtils.md5Hex(data); /*效验md5*/
+
+
                 /*写入图片到文件*/
-                if(true){
+                if(Tlc.md5s.contains(md5))
+                    return "md5重复不予保存...";
+                else{
+                    Tlc.md5s.add(md5);
                     String msgImageName = String.valueOf(new Random().nextLong())+".jpg";
                     File imageFile = new File(messageImageSavePath + msgImageName);
                     FileOutputStream outStreamSave = new FileOutputStream(imageFile);

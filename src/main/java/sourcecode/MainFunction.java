@@ -1,5 +1,6 @@
 package sourcecode;
 
+import com.alibaba.fastjson.JSONArray;
 import com.forte.component.forcoolqhttpapi.CoolQHttpApp;
 import com.forte.component.forcoolqhttpapi.CoolQHttpConfiguration;
 import com.forte.qqrobot.beans.messages.result.FriendList;
@@ -8,6 +9,7 @@ import com.forte.qqrobot.beans.messages.result.inner.Group;
 import com.forte.qqrobot.beans.messages.result.inner.GroupMember;
 import com.forte.qqrobot.sender.MsgSender;
 import com.forte.qqrobot.utils.CQCodeUtil;
+import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
 import sourcecode.Util.LogBack;
 import sourcecode.Util.Tlc;
 
@@ -80,13 +82,14 @@ public class MainFunction implements CoolQHttpApp {
                         for(String groupmemberkey : Tlc.groupMembers.keySet())
                             groupmembersum += Tlc.groupMembers.get(groupmemberkey).size();
 
+                        System.out.println("-------------------------------------------------");
                             System.out.println(
-                                    "-------------------------------------------------\n" +
+                                    //"-------------------------------------------------\n" +
                                             "好友数量: \t\t\t\t\t\t\t\t\t" + Tlc.friendMap.size() + "\n" +
-                                            "群数量: \t\t\t\t\t\t\t\t\t" + Tlc.groupMap.size() + "\n" +
-                                            "所有群成员总和数量: \t\t\t\t\t\t\t" + String.valueOf(groupmembersum)
+                                            "群数量: \t\t\t\t\t\t\t\t\t" + Tlc.groupMap.size() // + "\n" +
+                                            /*"所有群成员总和数量: \t\t\t\t\t\t\t" + String.valueOf(groupmembersum)*/
                             );
-                            for (String key : Tlc.groupMap.keySet()) {
+                            /*for (String key : Tlc.groupMap.keySet()) {
                                 String gropusum = String.valueOf(Tlc.groupMembers.get(key).size());
                                 System.out.print("\t\t" + gropusum);
 
@@ -96,10 +99,41 @@ public class MainFunction implements CoolQHttpApp {
                                 else
                                     System.out.print("\t\t\t");
                                 System.out.println(Tlc.groupMap.get(key));
-                            }
+                            }*/
+                        // System.out.println("-------------------------------------------------");
+                        /*加载机器人的管理对象*/
+                        if(Tlc.jobj != null){
+                            String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+                            JSONArray jary =  Tlc.jobj.getJSONArray("managementGroup");
+                            for(Object jobj : jary)
+                                if(Tlc.friendMap.keySet().contains(jobj.toString())){
+                                    Tlc.administrators.add(jobj.toString());
+                                    sender.SENDER.sendPrivateMsg(jobj.toString(),date);
+                                }else
+                                    System.out.println("没有好友: "+jobj.toString()+" 所以无法设为管理员...");
 
-                            System.out.println("-------------------------------------------------");
-                            return;
+                            jary =  Tlc.jobj.getJSONArray("administrators");
+                            for(Object jobj : jary)
+                                if(Tlc.groupMap.keySet().contains(jobj.toString())){
+                                    Tlc.managementGroupAry.add(jobj.toString());
+                                    sender.SENDER.sendGroupMsg(jobj.toString(),date);
+                                }else
+                                    System.out.println("没有群组: "+jobj.toString()+" 所以无法管理ta...");
+
+                        }
+                        System.out.print("管理员: ");
+                        for(String admin : Tlc.administrators)
+                            System.out.print("["+Tlc.friendMap.get(admin)+"]");
+
+                        System.out.print("\n管理的群: ");
+                        for(String mgtg : Tlc.managementGroupAry){
+                            System.out.print("["+Tlc.groupMap.get(mgtg)+"]");
+                            Tlc.msgCacheMap.put(mgtg,(new Tlc.MsgCache()));
+                        }
+
+                        System.out.println("\n-------------------------------------------------\n");
+
+                        return; /*数据加载完毕*/
 
                     }
                     Thread.sleep(150);
@@ -108,7 +142,7 @@ public class MainFunction implements CoolQHttpApp {
         }).start();
 
         System.out.println(
-                "  ┏┓　　　┏┓\n" +
+              "\n  ┏┓　　　┏┓\n" +
                 "┏┛┻━━━┛┻┓\n" +
                 "┃　　　　　　　┃\n" +
                 "┃　　　━　　　┃\n" +
@@ -125,19 +159,12 @@ public class MainFunction implements CoolQHttpApp {
                 "　　┗┓┓┏━┳┓┏┛\n" +
                 "　　　┃┫┫　┃┫┫\n" +
                 "　　　┗┻┛　┗┻┛");
-
+        System.out.println("-------------------------------------------------");
         System.out.println("当前系统: "+ (this.tool.windowsOS ? "Windows":"Linux"));
         System.out.println("消息图片存储路径: "+ tool.messageImageSavePath);
-        System.out.println("管理员: "+ tool.hyy);
+        //System.out.println("管理员: "+ Tlc.administrators.toString());
         System.out.println("执行环境: "+ (tool.windowsOS ? "开发" : "使用"));
-
-
-        /*启动成功时用以提示 发送一条信息*/
-        String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-        sender.SENDER.sendPrivateMsg(String.valueOf(tool.hyy),new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-        sender.SENDER.sendPrivateMsg(String.valueOf(tool.testQQ),new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-        sender.SENDER.sendGroupMsg(String.valueOf(tool.hyyGroup),new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-        sender.SENDER.sendGroupMsg(String.valueOf(tool.testGroup),new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+        System.out.println("-------------------------------------------------");
     }
 
 }

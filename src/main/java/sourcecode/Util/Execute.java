@@ -27,7 +27,8 @@ public class Execute implements TimeJob {
             else
                 msg = Tlc.randomMessage.get(random);
 
-            msgSender.SENDER.sendGroupMsg(Tlc.hyyGroup, msg);
+            for(String admin : Tlc.administrators)
+                msgSender.SENDER.sendGroupMsg(admin, msg);
         }
     }
 

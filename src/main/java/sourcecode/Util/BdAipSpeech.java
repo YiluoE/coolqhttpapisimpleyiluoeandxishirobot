@@ -11,8 +11,7 @@ public class BdAipSpeech extends AipSpeech {
 
     public BdAipSpeech(String appId, String apiKey, String secretKey) {
         super(appId, apiKey, secretKey);
-
-
+        
     }
 
     public static void getFile(byte[] bfile,String fileName) {
