@@ -5,7 +5,7 @@ import com.forte.qqrobot.beans.messages.msgget.GroupAddRequest;
 import com.forte.qqrobot.beans.messages.msgget.GroupMemberReduce;
 import com.forte.qqrobot.beans.messages.types.MsgGetTypes;
 import com.forte.qqrobot.sender.MsgSender;
-import sourcecode.Util.Tlc;
+import sourcecode.Util.TLC;
 
 public class GroupEvent {
 
@@ -13,7 +13,7 @@ public class GroupEvent {
     @Listen(MsgGetTypes.groupAddRequest)
     public void GroupAdd(GroupAddRequest groupAddRequest, MsgSender sender) {
 
-        if (Tlc.managementGroupAry.contains(groupAddRequest.getGroup())) {
+        if (TLC.managementGroupAry.contains(groupAddRequest.getGroup())) {
 
             sender.SENDER.sendGroupMsg(
                     groupAddRequest.getGroup(),
@@ -32,8 +32,8 @@ public class GroupEvent {
             String msg = groupAddRequest.getMsg().indexOf("邀请人")==-1?"G D X 有人通过搜索添加 进入你的群~":"通过群成员邀请进的群呢~";
             String groupAddRequestMsg = groupAddRequest.getMsg();
 
-            for(String admin : Tlc.administrators){
-                sender.SENDER.sendPrivateMsg(admin,msg+"\n"+"群: "+Tlc.groupMap.get(groupAddRequest.getGroup()));
+            for(String admin : TLC.administrators){
+                sender.SENDER.sendPrivateMsg(admin,msg+"\n"+"群: "+ TLC.groupMap.get(groupAddRequest.getGroup()));
                 sender.SENDER.sendPrivateMsg(admin,groupAddRequestMsg);
             }
 
@@ -45,7 +45,7 @@ public class GroupEvent {
     @Listen(MsgGetTypes.groupMemberReduce)
     public void GroupReduce(GroupMemberReduce groupMemberReduce, MsgSender sender) {
 
-        if (Tlc.managementGroupAry.contains(groupMemberReduce.getGroup())) {
+        if (TLC.managementGroupAry.contains(groupMemberReduce.getGroup())) {
             sender.SENDER.sendGroupMsg(
                     groupMemberReduce.getGroup(),
                     "最终: " + "\"" + sender.getPersonInfoByCode(groupMemberReduce.getBeOperatedQQ()).getName() + "\"" + " 还是选择了离开..."

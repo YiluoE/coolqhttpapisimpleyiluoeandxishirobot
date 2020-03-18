@@ -9,9 +9,9 @@ import com.forte.qqrobot.beans.messages.result.inner.Group;
 import com.forte.qqrobot.beans.messages.result.inner.GroupMember;
 import com.forte.qqrobot.sender.MsgSender;
 import com.forte.qqrobot.utils.CQCodeUtil;
-import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
 import sourcecode.Util.LogBack;
-import sourcecode.Util.Tlc;
+import sourcecode.Util.RandomString;
+import sourcecode.Util.TLC;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -19,10 +19,10 @@ import java.util.*;
 public class MainFunction implements CoolQHttpApp {
 
     /* 外部并不会用到,我认为这样会第一时间初始化,但可能java的处理更早..我不是很了解阿 */
-    private Tlc tool;
+    private TLC tool;
 
     public MainFunction(){
-        this.tool = new Tlc();
+        this.tool = new TLC();
     }
 
     public static void main(String[] args) {
@@ -50,7 +50,7 @@ public class MainFunction implements CoolQHttpApp {
                 for (String key : mapKeyList) { // key 好友分组
                     Friend[] fidList = fidGroupList.getFriendList().get(key);
                     for (Friend fid : fidList) {
-                        Tlc.friendMap.put(fid.getQQ(),fid.getName());
+                        TLC.friendMap.put(fid.getQQ(),fid.getName());
                         ; // fid对每个好友的操作
                     }
                 }
@@ -66,8 +66,8 @@ public class MainFunction implements CoolQHttpApp {
                     members.put(member.getQQ(),member.getName());
                     ; // member 对所有群所有成员的操作
                 }
-                Tlc.groupMap.put(group.getCode(),group.getName());
-                Tlc.groupMembers.put(group.getCode(),members);
+                TLC.groupMap.put(group.getCode(),group.getName());
+                TLC.groupMembers.put(group.getCode(),members);
                 ; // group 对所有群的操作
             }
             state[1] = true; return;
@@ -79,14 +79,14 @@ public class MainFunction implements CoolQHttpApp {
                     long groupmembersum = 0;
 
                     if(state[0] && state[1]){
-                        for(String groupmemberkey : Tlc.groupMembers.keySet())
-                            groupmembersum += Tlc.groupMembers.get(groupmemberkey).size();
+                        for(String groupmemberkey : TLC.groupMembers.keySet())
+                            groupmembersum += TLC.groupMembers.get(groupmemberkey).size();
 
                         System.out.println("-------------------------------------------------");
                             System.out.println(
                                     //"-------------------------------------------------\n" +
-                                            "好友数量: \t\t\t\t\t\t\t\t\t" + Tlc.friendMap.size() + "\n" +
-                                            "群数量: \t\t\t\t\t\t\t\t\t" + Tlc.groupMap.size() // + "\n" +
+                                            "好友数量: \t\t\t\t\t\t\t\t\t" + TLC.friendMap.size() + "\n" +
+                                            "群数量: \t\t\t\t\t\t\t\t\t" + TLC.groupMap.size() // + "\n" +
                                             /*"所有群成员总和数量: \t\t\t\t\t\t\t" + String.valueOf(groupmembersum)*/
                             );
                             /*for (String key : Tlc.groupMap.keySet()) {
@@ -102,33 +102,33 @@ public class MainFunction implements CoolQHttpApp {
                             }*/
                         // System.out.println("-------------------------------------------------");
                         /*加载机器人的管理对象*/
-                        if(Tlc.jobj != null){
+                        if(TLC.jobj != null){
                             String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-                            JSONArray jary =  Tlc.jobj.getJSONArray("managementGroup");
+                            JSONArray jary =  TLC.jobj.getJSONArray("managementGroup");
                             for(Object jobj : jary)
-                                if(Tlc.friendMap.keySet().contains(jobj.toString())){
-                                    Tlc.administrators.add(jobj.toString());
+                                if(TLC.friendMap.keySet().contains(jobj.toString())){
+                                    TLC.administrators.add(jobj.toString());
                                     sender.SENDER.sendPrivateMsg(jobj.toString(),date);
                                 }else
                                     System.out.println("没有好友: "+jobj.toString()+" 所以无法设为管理员...");
 
-                            jary =  Tlc.jobj.getJSONArray("administrators");
+                            jary =  TLC.jobj.getJSONArray("administrators");
                             for(Object jobj : jary)
-                                if(Tlc.groupMap.keySet().contains(jobj.toString())){
-                                    Tlc.managementGroupAry.add(jobj.toString());
+                                if(TLC.groupMap.keySet().contains(jobj.toString())){
+                                    TLC.managementGroupAry.add(jobj.toString());
                                     sender.SENDER.sendGroupMsg(jobj.toString(),date);
                                 }else
                                     System.out.println("没有群组: "+jobj.toString()+" 所以无法管理ta...");
 
                         }
                         System.out.print("管理员: ");
-                        for(String admin : Tlc.administrators)
-                            System.out.print("["+Tlc.friendMap.get(admin)+"]");
+                        for(String admin : TLC.administrators)
+                            System.out.print("["+ TLC.friendMap.get(admin)+"]");
 
                         System.out.print("\n管理的群: ");
-                        for(String mgtg : Tlc.managementGroupAry){
-                            System.out.print("["+Tlc.groupMap.get(mgtg)+"]");
-                            Tlc.msgCacheMap.put(mgtg,(new Tlc.MsgCache()));
+                        for(String mgtg : TLC.managementGroupAry){
+                            System.out.print("["+ TLC.groupMap.get(mgtg)+"]");
+                            TLC.msgCacheMap.put(mgtg,(new TLC.MsgCache()));
                         }
 
                         System.out.println("\n-------------------------------------------------\n");
